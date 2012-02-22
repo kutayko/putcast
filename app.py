@@ -1,7 +1,12 @@
 import sqlite3
+import datetime
+import json
 from contextlib import closing
+from urlparse import urljoin
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
+from werkzeug.contrib.atom import AtomFeed
+
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -37,6 +42,26 @@ def query_db(query, args=(), one=False):
 @app.route('/')
 def hello_world():
 	return 'Hello World!'
+
+
+@app.route('/<token>/tunes.atom')
+def get_feed():
+    # TODO: get selected items for user from db
+    # TODO: POST /files/list with parent_id
+    response = None
+
+    # TODO: iTunes required fields
+    feed = AtomFeed('Putio Tunes',
+                    feed_url='some url', url='root_url')
+    results = json.loads(response)
+    for file in results['files']:
+        if file['content_type'] == "audio/mpeg":
+            feed.add(file['name'], None,
+                        content_type=file['content_type'],
+                        url='http://someurl.com/%s' % file['id'],
+                        updated=file['created_at']
+                    )
+    return feed.get_response()
 
 if __name__ == '__main__':
     app.run()
