@@ -42,29 +42,31 @@ def query_db(query, args=(), one=False):
 
 
 @app.route('/')
-def hello_world():
-	return 'hello!'
-
+def index():
+    url = "%s/oauth2/authenticate?client_id=%s" % (config.PUTIO_API_URL, config.APP_ID)
+    url = "%s&response_type=code&redirect_uri=%s/register" % (url, config.DOMAIN)
+    return redirect(url)
 
 @app.route('/register')
 def register():
     code = request.args.get('code')
-    if code:
+    error = request.args.get('error')
+    if error:
+        return "ERROR: %s" % error
+    elif code:
         url = "%s/oauth2/access_token" % config.PUTIO_API_URL
         url = "%s?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
         url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
         url = "%s&code=%s" % code
 
         try:
-            request = urllib2.Request(token_url)
-            response = urllib2.urlopen(request)
-            return response.read()
-            """
+            req = urllib2.Request(url)
+            response = urllib2.urlopen(req)
             data = json.dumps(response.read())
             return data.access_token
         except urllib2.URLError as e:
-            return 'Can not establish connection to put.io'
-            """
+            return 'URLError'
+    return redirect(url_for('index'))
 
 
 @app.route('/feed/<token>/<name>.atom')
