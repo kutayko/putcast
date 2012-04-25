@@ -1,11 +1,13 @@
 import sqlite3
 import datetime
 import json
+import urllib2
 from contextlib import closing
 from urlparse import urljoin
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from werkzeug.contrib.atom import AtomFeed
+import config
 
 
 app = Flask(__name__)
@@ -41,11 +43,32 @@ def query_db(query, args=(), one=False):
 
 @app.route('/')
 def hello_world():
-	return 'Hello World!'
+	return 'hello!'
 
 
-@app.route('/<token>/tunes.atom')
-def get_feed():
+@app.route('/register')
+def register():
+    code = request.args.get('code')
+    if code:
+        url = "%s/oauth2/access_token" % config.PUTIO_API_URL
+        url = "%s?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
+        url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
+        url = "%s&code=%s" % code
+
+        try:
+            request = urllib2.Request(token_url)
+            response = urllib2.urlopen(request)
+            return response.read()
+            """
+            data = json.dumps(response.read())
+            return data.access_token
+        except urllib2.URLError as e:
+            return 'Can not establish connection to put.io'
+            """
+
+
+@app.route('/feed/<token>/<name>.atom')
+def get_feed(token, name="putcast"):
     # TODO: get selected items for user from db
     # TODO: POST /files/list with parent_id
     response = None
