@@ -57,7 +57,7 @@ def register():
         url = "%s/oauth2/access_token" % config.PUTIO_API_URL
         url = "%s?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
         url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
-        url = "%s&code=%s" % code
+        url = "%s&code=%s" % (url, code)
 
         try:
             req = urllib2.Request(url)
