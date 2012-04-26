@@ -58,7 +58,7 @@ def register():
     if error:
         return "ERROR: %s" % error
     elif code:
-        url = "/oauth2/access_token?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
+        url = "/oauth2/access_token?client_id=%s&client_secret=%s" % (config.APP_ID, config.APP_SECRET)
         url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
         url = "%s&code=%s" % (url, code)
 
