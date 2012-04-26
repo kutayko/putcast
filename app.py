@@ -66,7 +66,6 @@ def register():
         if 'access_token' in data:
             # TODO: user_id nerden geliyor?
             query_db('insert into users set id=?, token=?', [user_id, data['access_token']])
-            redirect("index")
     return redirect(url_for('index'))
 
 @app.route('/feed/create', methods=['POST'])
