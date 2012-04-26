@@ -2,11 +2,15 @@ import sqlite3
 import datetime
 import json
 import urllib2
+import string
+import random
+
 from contextlib import closing
 from urlparse import urljoin
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from werkzeug.contrib.atom import AtomFeed
+
 import config
 
 
@@ -41,52 +45,83 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     url = "%s/oauth2/authenticate?client_id=%s" % (config.PUTIO_API_URL, config.APP_ID)
     url = "%s&response_type=code&redirect_uri=%s/register" % (url, config.DOMAIN)
     return redirect(url)
 
-@app.route('/register')
+@app.route('/register', methods=['GET'])
 def register():
     code = request.args.get('code')
     error = request.args.get('error')
     if error:
         return "ERROR: %s" % error
     elif code:
-        url = "%s/oauth2/access_token" % config.PUTIO_API_URL
-        url = "%s?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
+        url = "/oauth2/access_token?client_id=%s&client_secret=%s" % (url, config.APP_ID, config.APP_SECRET)
         url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
         url = "%s&code=%s" % (url, code)
 
-        try:
-            req = urllib2.Request(url)
-            response = urllib2.urlopen(req)
-            data = json.dumps(response.read())
-            return data.access_token
-        except urllib2.URLError as e:
-            return 'URLError'
+        data = putio_call(url)
+        if 'access_token' in data:
+            # TODO: user_id nerden geliyor?
+            query_db('insert into users set id=?, token=?', [user_id, data['access_token']])
+            redirect("index")
     return redirect(url_for('index'))
 
+@app.route('/feed/create', methods=['POST'])
+def new_feed():
+    try:
+        name = request.form['name']
+        items = json.loads(request.form['items'])
+        audio = request.form['audio']
+        video = request.form['video']
+    except KeyError:
+        abort(400)
+    
+    token = generate_feed_token()
+    query_db('insert into feeds set token=?, name=?, audio=?, video=?',
+                [token, name, bool(audio), bool(video)])
 
-@app.route('/feed/<token>/<name>.atom')
+    for item in items:
+        query_db('insert into items set token=?, folder_id=?',
+                [token, item])
+
+    return redirect(url_for('index'))
+
+@app.route('/feed/<token>/<name>.atom', methods=['GET'])
 def get_feed(token, name="putcast"):
-    # TODO: get selected items for user from db
-    # TODO: POST /files/list with parent_id
-    response = None
+    items = query_db('select * from items where token=?', [token])
+    for item in items:
+        folder = putio_call('/files/list/%s' % item)
 
-    # TODO: iTunes required fields
-    feed = AtomFeed('Putio Tunes',
-                    feed_url='some url', url='root_url')
-    results = json.loads(response)
-    for file in results['files']:
-        if file['content_type'] == "audio/mpeg":
-            feed.add(file['name'], None,
-                        content_type=file['content_type'],
-                        url='http://someurl.com/%s' % file['id'],
-                        updated=file['created_at']
-                    )
+        # TODO: iTunes required fields
+        feed = AtomFeed(name,
+                        feed_url='some url', url='root_url')
+        results = json.loads(folder)
+        for file in results['files']:
+            if file['content_type'] == "audio/mpeg":
+                feed.add(file['name'], None,
+                            content_type=file['content_type'],
+                            url='http://someurl.com/%s' % file['id'],
+                            updated=file['created_at']
+                        )
     return feed.get_response()
+
+
+def putio_call(query):
+    url = "%s%s" % (config.PUTIO_API_URL, query)
+    req = urllib2.Request(url)
+    response = urllib2.urlopen(req)
+    data = response.read()
+    return json.loads(data)
+
+def generate_feed_token():
+    token =  ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
+    feed = query_db('select * from feeds where hash = ?', [token], one=True)
+    if feed:
+        return generate_feed_token()
+    return token
 
 if __name__ == '__main__':
     app.run()

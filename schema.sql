@@ -9,7 +9,7 @@ create table users (
 
 create table items (
   id integer primary key autoincrement,
-  user_id integer not null,
+  token varchar not null,
   folder_id integer not null
 );
 
