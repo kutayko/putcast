@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
 import json
+import urllib
 import urllib2
 import string
 import random
@@ -107,6 +108,26 @@ def new_feed():
 @app.route('/feed/delete', methods=['POST'])
 def delete_feed():
     raise NotImplementedError
+
+
+@app.route('/feed/list', methods=['GET'])
+def list_feeds():
+    #feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
+    feeds = query_db('select * from Feeds where user_token=?', ['sample_token'])
+    response = []
+    for feed in feeds:
+        items = query_db('select * from Items where feed_token=?', [feed['feed_token']])
+        items_parsed = [item['folder_id'] for item in items]
+        name_encoded = urllib.quote_plus(feed['name'])
+        feed_response = {
+            "name": feed['name'],
+            "url": "%s/feed/%s/%s.atom" % (config.DOMAIN, feed['feed_token'], name_encoded),
+            "audio": feed['audio'],
+            "video": feed['video'],
+            "items": json.dumps(items_parsed)
+        }
+        response.append(feed_response)
+    return render_template('feeds.html',feeds=response)
 
 
 @app.route('/feed/<feed_token>', methods=['GET'])
