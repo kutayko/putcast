@@ -77,7 +77,6 @@ def register():
 
         data = putio_call(url)
         if 'access_token' in data:
-            query_db('insert into users (token) values ("?")', [data['access_token']])
             session['oauth_token'] = data['access_token']
     return redirect(url_for('index'))
 
