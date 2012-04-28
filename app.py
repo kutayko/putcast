@@ -54,10 +54,9 @@ def query_db(query, args=(), one=False):
 @app.route('/', methods=['GET'])
 def index():
     if "oauth_token" in session:
-        response = putio_call('/account/info')
-        return "Hello %s !!" % response['info']['username']
+        redirect(url_for('list_feeds'))
     else:
-        return redirect(url_for('auth'))
+        return render_template('index.html')
 
 
 @app.route('/auth', methods=['GET'])
@@ -136,14 +135,14 @@ def get_feed(feed_token, name="putcast"):
     feed = query_db('select * from Feeds where feed_token=?', [feed_token], one=True)
     if feed:
         # TODO: iTunes required fields
-        atom_feed = AtomFeed(feed.name,
+        atom_feed = AtomFeed(feed['name'],
                         feed_url=request.url,
                         url=request.host_url,
                         subtitle='PutCast - sync Put.io with iTunes')
 
         items = query_db('select * from items where feed_token=?', [feed_token])
         for item in items:
-            feed_crawler(atom_feed, item.folder_id, audio=feed.audio, video=feed.video)
+            feed_crawler(atom_feed, item['folder_id'], audio=feed['audio'], video=feed['video'])
         return atom_feed.get_response()
     else:
         abort(404)
@@ -163,7 +162,8 @@ def test_feed():
 
 
 def feed_crawler(feed, folder_id, audio=True, video=True):
-    files = putio_call('/files/list/%s' % item.folder_id)
+    files = putio_call('/files/list/%s' % folder_id)
+    files = files['files']
     for f in files:
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
                     (video and f['content_type'] in SUPPORTED_VIDEO_DIRECT):
@@ -202,4 +202,5 @@ def generate_feed_token():
 
 
 if __name__ == '__main__':
+    app.debug = config.DEBUG
     app.run()
