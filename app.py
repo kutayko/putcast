@@ -161,7 +161,7 @@ def test_feed():
 
 
 def feed_crawler(feed, folder_id, audio=True, video=True):
-    files = putio_call('/files/list/%s' % folder_id)
+    files = putio_call('/files/list?parent_id=%s' % folder_id)
     files = files['files']
     for f in files:
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
@@ -185,7 +185,11 @@ def feed_crawler(feed, folder_id, audio=True, video=True):
 def putio_call(query):
     url = "%s%s" % (config.PUTIO_API_URL, query)
     if 'oauth_token' in session:
-        url += "?oauth_token=%s" % session['oauth_token']
+        # TODO: too ugly, fix this
+        separator = "?"
+        if "?" in url:
+            separator = "&"
+        url += "%soauth_token=%s" % (separator, session['oauth_token'])
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
     data = response.read()
