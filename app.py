@@ -53,7 +53,7 @@ def query_db(query, args=(), one=False):
 def index():
     if "oauth_token" in session:
         response = putio_call('/account/info')
-        return "Hello %s !!" % response['account']['username']
+        return "Hello %s !!" % response['info']['username']
     else:
         return redirect(url_for('auth'))
 
@@ -127,7 +127,7 @@ def get_feed(feed_token, name="putcast"):
 def test_feed():
     feed = AtomFeed('PutCast',
                     feed_url='some url', url='root_url',
-                    subtitle="referrer: %" % request.referrer)
+                    subtitle="referrer: %s" % request.referrer)
     feed.add('Item name', "content",
                 content_type="text",
                 url='http://someurl.com/',
