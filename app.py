@@ -111,8 +111,7 @@ def delete_feed():
 
 @app.route('/feed/list', methods=['GET'])
 def list_feeds():
-    #feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
-    feeds = query_db('select * from Feeds where user_token=?', ['sample_token'])
+    feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
     response = []
     for feed in feeds:
         items = query_db('select * from Items where feed_token=?', [feed['feed_token']])
