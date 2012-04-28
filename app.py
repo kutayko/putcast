@@ -21,6 +21,7 @@ SUPPORTED_AUDIO = ('audio/mpeg')
 SUPPORTED_VIDEO = ('video/x-msvideo', 'application/octet-stream')
 SUPPORTED_VIDEO_DIRECT = ('video/mp4')
 
+
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -64,6 +65,7 @@ def auth():
     url = "%s&response_type=code&redirect_uri=%s/register" % (url, config.DOMAIN)
     return redirect(url)
 
+
 @app.route('/register', methods=['GET'])
 def register():
     code = request.args.get('code')
@@ -79,6 +81,7 @@ def register():
         if 'access_token' in data:
             session['oauth_token'] = data['access_token']
     return redirect(url_for('index'))
+
 
 @app.route('/feed/create', methods=['POST'])
 def new_feed():
@@ -100,9 +103,11 @@ def new_feed():
 
     return redirect(url_for('index'))
 
+
 @app.route('/feed/delete', methods=['POST'])
 def delete_feed():
     raise NotImplementedError
+
 
 @app.route('/feed/<feed_token>', methods=['GET'])
 @app.route('/feed/<feed_token>/<name>.atom', methods=['GET'])
@@ -122,6 +127,7 @@ def get_feed(feed_token, name="putcast"):
     else:
         abort(404)
 
+
 @app.route('/feed/test', methods=['GET'])
 def test_feed():
     feed = AtomFeed('PutCast',
@@ -133,6 +139,7 @@ def test_feed():
                 updated=datetime.datetime.now()
             )
     return feed.get_response()
+
 
 def feed_crawler(feed, folder_id, audio=True, video=True):
     files = putio_call('/files/list/%s' % item.folder_id)
@@ -154,6 +161,7 @@ def feed_crawler(feed, folder_id, audio=True, video=True):
         if f['content_type'] == "application/x-directory":
             feed_crawler(feed, f['id'], audio, video)
 
+
 def putio_call(query):
     url = "%s%s" % (config.PUTIO_API_URL, query)
     if 'oauth_token' in session:
@@ -163,12 +171,14 @@ def putio_call(query):
     data = response.read()
     return json.loads(data)
 
+
 def generate_feed_token():
     token =  ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
     feed = query_db('select * from feeds where hash = ?', [token], one=True)
     if feed:
         return generate_feed_token()
     return token
+
 
 if __name__ == '__main__':
     app.run()
