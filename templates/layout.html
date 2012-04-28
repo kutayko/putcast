@@ -1,0 +1,64 @@
+<!DOCTYPE html> <!-- The new doctype -->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        
+        <title>PutCast - sync Put.io with iTunes</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        
+        <!-- Internet Explorer HTML5 enabling code: -->
+        
+        <!--[if IE]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        
+        <style type="text/css">
+        .clear {
+          zoom: 1;
+          display: block;
+        }
+        </style>
+
+        
+        <![endif]-->
+    </head>
+    <body>
+        <section id="page">
+        <header>
+            <hgroup>
+                <h1>PutCast</h1>
+                <h3>sync Put.io with iTunes</h3>
+            </hgroup>
+            <nav class="clear">
+                <ul>
+                    <li><a href="http://put.io">Put.io</a></li>
+                    <li><a href="http://www.apple.com/itunes/">iTunes</a></li>
+                    <li><a href="http://foov.io">About Me</a></li>
+                </ul>
+            </nav>
+        </header>
+            
+        <section id="articles">
+            <div class="line"></div>
+            {% block content %}
+            {% endblock %}
+        </section>
+
+        <footer>
+
+           <div class="line"></div>
+           
+           <p>Copyright 2012 - FooV.io</p>
+           
+           <a href="#" class="up">Go UP</a>
+           <a href="http://www.html5xcss3.com/" class="by" target="_blank">Free Html5 Templates</a> <a href="http://tutorialzine.com" target="_blank" class="by"> by Tutorialzine</a>
+           
+
+        </footer>
+        </section>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+        <script src="jquery.scrollTo-1.4.2/jquery.scrollTo-min.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
+    
+    
