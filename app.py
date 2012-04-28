@@ -17,6 +17,10 @@ import config
 app = Flask(__name__)
 app.config.from_object('config')
 
+SUPPORTED_AUDIO = ('audio/mpeg')
+SUPPORTED_VIDEO = ('video/x-msvideo', 'application/octet-stream')
+SUPPORTED_VIDEO_DIRECT = ('video/mp4')
+
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -87,35 +91,69 @@ def new_feed():
     except KeyError:
         abort(400)
     
-    token = generate_feed_token()
-    query_db('insert into feeds set token=?, name=?, audio=?, video=?',
-                [token, name, bool(audio), bool(video)])
+    feed_token = generate_feed_token()
+    query_db('insert into feeds (user_token, feed_token, name, audio, video) values (?, ? ,?, ?, ?)',
+                [session['oauth_token'], feed_token, name, bool(audio), bool(video)])
 
     for item in items:
-        query_db('insert into items set token=?, folder_id=?',
-                [token, item])
+        query_db('insert into items (feed_token, folder_id) values (?, ?)',
+                [feed_token, item])
 
     return redirect(url_for('index'))
 
-@app.route('/feed/<token>/<name>.atom', methods=['GET'])
-def get_feed(token, name="putcast"):
-    items = query_db('select * from items where token=?', [token])
-    for item in items:
-        folder = putio_call('/files/list/%s' % item)
+@app.route('/feed/delete', methods=['POST'])
+def delete_feed():
+    raise NotImplementedError
 
+@app.route('/feed/<feed_token>', methods=['GET'])
+@app.route('/feed/<feed_token>/<name>.atom', methods=['GET'])
+def get_feed(feed_token, name="putcast"):
+    feed = query_db('select * from Feeds where feed_token=?', [feed_token], one=True)
+    if feed:
         # TODO: iTunes required fields
-        feed = AtomFeed(name,
-                        feed_url='some url', url='root_url')
-        results = json.loads(folder)
-        for file in results['files']:
-            if file['content_type'] == "audio/mpeg":
-                feed.add(file['name'], None,
-                            content_type=file['content_type'],
-                            url='http://someurl.com/%s' % file['id'],
-                            updated=file['created_at']
-                        )
+        atom_feed = AtomFeed(feed.name,
+                        feed_url=request.url,
+                        url=request.host_url,
+                        subtitle='PutCast - sync Put.io with iTunes')
+
+        items = query_db('select * from items where feed_token=?', [feed_token])
+        for item in items:
+            feed_crawler(atom_feed, item.folder_id, audio=feed.audio, video=feed.video)
+        return atom_feed.get_response()
+    else:
+        abort(404)
+
+@app.route('/feed/test', methods=['GET'])
+def test_feed():
+    feed = AtomFeed('PutCast',
+                    feed_url='some url', url='root_url',
+                    subtitle="referrer: %" % request.referrer)
+    feed.add('Item name', "content",
+                content_type="text",
+                url='http://someurl.com/',
+                updated=datetime.datetime.now()
+            )
     return feed.get_response()
 
+def feed_crawler(feed, folder_id, audio=True, video=True):
+    files = putio_call('/files/list/%s' % item.folder_id)
+    for f in files:
+        if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
+                    (video and f['content_type'] in SUPPORTED_VIDEO_DIRECT):
+                feed.add(title=f['name'],
+                url='%s/files/%s/download' % (config.PUTIO_API_URL, f['id']),
+                updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
+            )
+
+        if video and f['content_type'] in SUPPORTED_VIDEO:
+            # TODO: Check if mp4 available
+            feed.add(title=f['name'],
+                url='%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id']),
+                updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
+            )
+        
+        if f['content_type'] == "application/x-directory":
+            feed_crawler(feed, f['id'], audio, video)
 
 def putio_call(query):
     url = "%s%s" % (config.PUTIO_API_URL, query)
