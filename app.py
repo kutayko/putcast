@@ -54,7 +54,7 @@ def query_db(query, args=(), one=False):
 @app.route('/', methods=['GET'])
 def index():
     if "oauth_token" in session:
-        redirect(url_for('list_feeds'))
+        return redirect(url_for('list_feeds'))
     else:
         return render_template('index.html')
 
