@@ -47,6 +47,15 @@ def query_db(query, args=(), one=False):
 
 @app.route('/', methods=['GET'])
 def index():
+    if "oauth_token" in session:
+        response = putio_call('/account/info')
+        return "Hello %s !!" % response['account']['username']
+    else:
+        return redirect(url_for('auth'))
+
+
+@app.route('/auth', methods=['GET'])
+def auth():
     url = "%s/oauth2/authenticate?client_id=%s" % (config.PUTIO_API_URL, config.APP_ID)
     url = "%s&response_type=code&redirect_uri=%s/register" % (url, config.DOMAIN)
     return redirect(url)
@@ -64,8 +73,8 @@ def register():
 
         data = putio_call(url)
         if 'access_token' in data:
-            # TODO: user_id nerden geliyor?
-            query_db('insert into users set id=?, token=?', [user_id, data['access_token']])
+            query_db('insert into users (token) values ("?")', [data['access_token']])
+            session['oauth_token'] = data['access_token']
     return redirect(url_for('index'))
 
 @app.route('/feed/create', methods=['POST'])
@@ -110,6 +119,8 @@ def get_feed(token, name="putcast"):
 
 def putio_call(query):
     url = "%s%s" % (config.PUTIO_API_URL, query)
+    if 'oauth_token' in session:
+        url += "?oauth_token=%s" % session['oauth_token']
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
     data = response.read()
