@@ -6,6 +6,7 @@ import urllib2
 import string
 import random
 
+from functools import wraps
 from contextlib import closing
 from urlparse import urljoin
 from flask import Flask, request, session, g, redirect, url_for, \
@@ -21,6 +22,9 @@ app.config.from_object('config')
 SUPPORTED_AUDIO = ('audio/mpeg')
 SUPPORTED_VIDEO = ('video/x-msvideo')
 SUPPORTED_VIDEO_DIRECT = ('video/mp4')
+
+
+# DATABASE RELATED
 
 
 def connect_db():
@@ -49,6 +53,26 @@ def query_db(query, args=(), one=False):
     rv = [dict((cur.description[idx][0], value)
                for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
+
+
+# AUTH CHECK DECORATOR
+def auth_required(f):
+    '''
+    Use as decorator.
+    Redirects to index if user is not logged in.
+    '''
+
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        try:
+            session['oauth_token']
+            return f(*args, **kwargs)
+        except KeyError:
+            return redirect(url_for('index'))
+    return decorated
+
+
+# ROUTES
 
 
 @app.route('/', methods=['GET'])
@@ -91,6 +115,7 @@ def register():
 
 
 @app.route('/feed/create', methods=['POST'])
+@auth_required
 def new_feed():
     try:
         name = request.form['feed_name']
@@ -120,11 +145,13 @@ def new_feed():
 
 
 @app.route('/feed/delete', methods=['POST'])
+@auth_required
 def delete_feed():
     raise NotImplementedError
 
 
 @app.route('/feeds', methods=['GET'])
+@auth_required
 def list_feeds():
     feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
     response = []
@@ -163,8 +190,12 @@ def get_feed(feed_token, name="putcast"):
 
 
 @app.route('/proxy/files/<int:parent_id>')
+@auth_required
 def putio_proxy(parent_id=0):
     return json.dumps(putio_call('/files/list?parent_id=%s' % parent_id))
+
+
+# HELPERS
 
 
 def feed_crawler(feed, folder_id, audio=True, video=True):
