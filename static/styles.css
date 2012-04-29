@@ -59,7 +59,7 @@ h3{
 
 
 h2{
-	font-size:2.2em;
+	font-size:24px;
 	font-weight:normal;
 	letter-spacing:0.01em;
 }
@@ -218,7 +218,7 @@ footer a.up{
 	float:right;
 }
 
-.start-button {
+.button {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FF6600), color-stop(100%,#E45C00));
     background: -moz-linear-gradient(center top, #FF6600 0%, #E45C00 100%);
     -webkit-box-shadow: 0px 0px 2px #666;
@@ -238,13 +238,14 @@ footer a.up{
     color: #ffffff;
     font-weight: bold;
 }
-.start-button:hover {
+.button:hover {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FF8400), color-stop(100%,#FF7700));
     background: -moz-linear-gradient(center top, #FF8400 0%, #FF7700 100%);
     text-shadow: 0px 0px 1px #fff;
     border-color: #FF7700;
+    text-decoration: none;
 }
-.start-button:active {
+.button:active {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FF8400), color-stop(100%,#D96700));
     background: -moz-linear-gradient(center top, #FF8400 0%, #D96700 100%);
     -webkit-transition: 0 0.5s ease;
@@ -252,6 +253,21 @@ footer a.up{
     -o-transition: 0 0.5s ease;
     transition: 0 0.5s ease;
     text-shadow: 0px 0px 2px #999;
+}
+
+.close {
+    border-radius: 100px;
+    padding: 1px 4px;
+    font-size: 20px;
+    position: absolute;
+    top:0px;
+    right:0px;
+}
+
+.add {
+    border-radius: 100px;
+    padding: 1px 4px;
+    font-size: 20px;   
 }
 
 #modal {
@@ -264,4 +280,12 @@ footer a.up{
 	padding: 10px;
 	border: 1px solid #DDD;
 	overflow: auto;
+}
+
+.orange {
+    color: #FF8400;
+}
+
+.cream {
+    color: #FFFFCC;   
 }
