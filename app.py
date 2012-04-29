@@ -56,7 +56,12 @@ def index():
     if "oauth_token" in session:
         return redirect(url_for('list_feeds'))
     else:
-        return render_template('index.html')
+        return redirect(url_for('about'))
+
+
+@app.route('/about')
+def about():
+    return render_template('index.html')
 
 
 @app.route('/auth', methods=['GET'])
@@ -109,7 +114,7 @@ def delete_feed():
     raise NotImplementedError
 
 
-@app.route('/feed/list', methods=['GET'])
+@app.route('/feeds', methods=['GET'])
 def list_feeds():
     feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
     response = []
