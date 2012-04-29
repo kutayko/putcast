@@ -1,3 +1,4 @@
 config.py
 putio.db
+env/
 *.pyc

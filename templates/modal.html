@@ -4,7 +4,8 @@ var ModalBox = function(box, o){
     this.feed_name = null;
     this.audio = false;
     this.video = false;
-    this.items = -1;
+    this.items = new Array();
+    this.action = null;
 
     this.initialize = function(box, o){
         this.box = box;
@@ -12,19 +13,23 @@ var ModalBox = function(box, o){
         this.audio = o.audio;
         this.video = o.video;
         this.items = o.items;
+        this.action = o.action;
+
+        $(this.box + ' form').attr("action", this.action);
+        $(this.box + ' form input[name=feed_name]').val(this.feed_name);
+        $(this.box + ' form input[name=audio]').val(this.audio);
+        $(this.box + ' form input[name=video]').val(this.video);
     }
 
     this.confirm = function(){
-        // TODO: AJAX submit form
+        $(this.box + ' form').submit();
         $.colorbox.close();
-        $(this.handler).html(this.feed_name);
     }
 
     this.show = function(){
         var self = this;
         $("#modal-title").html("Feed Options:");
 
-        // TODO: Highlight items
         $("#dir-tree").jstree({
             "themes": {
                 "theme": "classic",
@@ -75,8 +80,12 @@ var ModalBox = function(box, o){
             },
             "plugins" : ["themes", "json_data", "ui"]
         }).bind("select_node.jstree", function (e, data){
-            // TODO: Multiple select
-            self.items = data.rslt.obj.attr("id");
+            var items  = [];
+            $.each($('#dir-tree').jstree("get_selected"), function(index, item){
+                items.push(item.id);
+            });
+            console.log(items);
+            $(self.box + ' form input[name=items]').val(items.join());
         });
         $.colorbox({
             inline:true,
@@ -90,7 +99,6 @@ var ModalBox = function(box, o){
                 var h = $('#cboxLoadedContent').height();
                 $('#cboxLoadedContent').height(h);
                 $('#cboxOverlay').css({'opacity': 0.3});
-                //$('#cboxClose').remove();
             }
         });
     }
@@ -103,25 +111,26 @@ var ModalBox = function(box, o){
         <div id="modal-title" style="margin:10px 20px;font-size:20px;font-weight:bold">
         </div>
         <div id="modal-inner" style="margin:10px 20px 10px 20px;padding:10px;border: 1px solid #DDD">
-            <form method="post" action="">
+            <form method="post" action="test">
                 <span style="margin-left: 10px;">
-                    Name: <input type="text" size="15" name="feed_name" readonly="readonly" value="My Feed" />
+                    Name: <input type="text" size="15" name="feed_name" value="" />
                 </span>
                 <div id="dir-tree">
                 </div>
                 <table style="margin-left:8px;">
                     <tr>
-                        <td><input style="margin-top:3px;" type="checkbox" name="audio" value="True" /></td>
+                        <td><input style="margin-top:3px;" type="checkbox" name="types" value="audio" /></td>
                         <td> Audio </td>
                         <td>&nbsp;</td>
-                        <td><input style="margin-top:3px;" type="checkbox" name="Video" value="True" /></td>
+                        <td><input style="margin-top:3px;" type="checkbox" name="types" value="video" /></td>
                         <td> Video </td>
                     </tr>
                 </table>
+                <input type="hidden" name="items" value="" />
             </form>
         </div>
         <div style="float:right; margin:10px 20px;">
-            <a class="start-button" style="padding:5px 10px;margin-top:5px;font-size:16px;" href="javascript:;" onclick="modal.confirm()">Save</a>
+            <a class="start-button" style="padding:5px 10px;margin-top:5px;font-size:16px;" href="javascript:;" onclick="CreateFeed.confirm()">Save</a>
         </div>
     </div>
 </div>

@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 SUPPORTED_AUDIO = ('audio/mpeg')
-SUPPORTED_VIDEO = ('video/x-msvideo', 'application/octet-stream')
+SUPPORTED_VIDEO = ('video/x-msvideo')
 SUPPORTED_VIDEO_DIRECT = ('video/mp4')
 
 
@@ -85,27 +85,37 @@ def register():
         data = putio_call(url)
         if 'access_token' in data:
             session['oauth_token'] = data['access_token']
+            user = putio_call('/account/info')
+            session['username'] = user['info']['username']
     return redirect(url_for('index'))
 
 
 @app.route('/feed/create', methods=['POST'])
 def new_feed():
     try:
-        name = request.form['name']
-        items = json.loads(request.form['items'])
-        audio = request.form['audio']
-        video = request.form['video']
+        name = request.form['feed_name']
+        items = request.form['items']
+        audio = request.form.get('audio', False)
+        types = request.form.getlist('types')
     except KeyError:
         abort(400)
     
+    audio = False
+    video = False
+    if 'audio' in types:
+        audio = True
+    if 'video' in types:
+        video = True
+
     feed_token = generate_feed_token()
     query_db('insert into feeds (user_token, feed_token, name, audio, video) values (?, ? ,?, ?, ?)',
-                [session['oauth_token'], feed_token, name, bool(audio), bool(video)])
+                [session['oauth_token'], feed_token, name, audio, video])
 
-    for item in items:
+    for item in items.split(','):
         query_db('insert into items (feed_token, folder_id) values (?, ?)',
                 [feed_token, item])
-
+    
+    g.db.commit()
     return redirect(url_for('index'))
 
 
@@ -157,22 +167,6 @@ def putio_proxy(parent_id=0):
     return json.dumps(putio_call('/files/list?parent_id=%s' % parent_id))
 
 
-@app.route('/feed/test', methods=['GET'])
-def test_feed():
-    feed = AtomFeed('PutCast',
-                    feed_url='some url', url='root_url',
-                    subtitle="referrer: %s" % request.referrer)
-    feed.add('Item name', "content",
-                content_type="text",
-                url='http://someurl.com/',
-                updated=datetime.datetime.now()
-            )
-    return feed.get_response()
-
-@app.route('/token/test', methods=['GET'])
-def test_token():
-    return session['oauth_token']
-
 def feed_crawler(feed, folder_id, audio=True, video=True):
     files = putio_call('/files/list?parent_id=%s' % folder_id)
     files = files['files']
@@ -191,6 +185,13 @@ def feed_crawler(feed, folder_id, audio=True, video=True):
                 updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
             )
         
+        # TODO: mkv from content type?
+        if video and f['name'].endswidth(".mkv"):
+            feed.add(title=f['name'],
+                url='%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id']),
+                updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
+            )
+
         if f['content_type'] == "application/x-directory":
             feed_crawler(feed, f['id'], audio, video)
 
@@ -211,7 +212,7 @@ def putio_call(query):
 
 def generate_feed_token():
     token =  ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
-    feed = query_db('select * from feeds where hash = ?', [token], one=True)
+    feed = query_db('select * from feeds where feed_token = ?', [token], one=True)
     if feed:
         return generate_feed_token()
     return token
@@ -219,4 +220,5 @@ def generate_feed_token():
 
 if __name__ == '__main__':
     app.debug = config.DEBUG
+    #app.run(host="0.0.0.0", port=80)
     app.run()

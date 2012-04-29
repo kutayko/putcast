@@ -52,9 +52,9 @@ h1{
 h3{
 	/* The slogan text */
 	font-family:forte,"Myriad Pro","Helvetica Neue",Helvetica,Arial,Sans-Serif;
-	font-size:2em;
+	font-size:22px;
 	font-weight:normal;
-	margin:0 0 1em;
+	margin:0 0 10px;
 }
 
 
@@ -69,6 +69,8 @@ p{
 	line-height:1.5em;
 	padding-bottom:1em;
 }
+
+p.tight { padding-bottom:0;}
 
 .line{
 	/* The dividing line: */
