@@ -5,7 +5,11 @@
         
         <title>PutCast | sync Put.io with iTunes</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='colorbox/example1/colorbox.css') }}">
         
+        <script src="{{ url_for('static', filename='jquery-1.7.2.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='jstree/jquery.jstree.js') }}"></script>
+        <script src="{{ url_for('static', filename='colorbox/colorbox/jquery.colorbox-min.js') }}"></script>
         <!-- Internet Explorer HTML5 enabling code: -->
         
         <!--[if IE]>
@@ -32,6 +36,7 @@
                 <ul>
                     <li><a href="http://put.io">Put.io</a></li>
                     <li><a href="http://www.apple.com/itunes/">iTunes</a></li>
+                    <li><a href="/about">About PutCast</a></li>
                     <li><a href="http://foov.io">About Me</a></li>
                 </ul>
             </nav>
@@ -55,9 +60,6 @@
 
         </footer>
         </section>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-        <script src="jquery.scrollTo-1.4.2/jquery.scrollTo-min.js"></script>
-        <script src="script.js"></script>
     </body>
 </html>
     

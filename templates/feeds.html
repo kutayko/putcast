@@ -1,20 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
+{% include 'modal.html' %}
+
 {% for feed in feeds %}
 <article id="feed-1">
-    <h2>{{ feed['name'] }}</h2>
+    <h2><a href="javascript:;" onclick="modal.show();">{{ feed['name'] }}</a></h2>
     <div class="line"></div>
-    <input type="text" size="50" onfocus="this.select()" readonly="readonly" value="{{ feed['url'] }}">
-    <input type="hidden" name="items" value="{{ feed['items'] }}">
-    <input type="hidden" name="audio" value="{{ feed['audio'] }}">
-    <input type="hidden" name="video" value="{{ feed['video'] }}">
+    <input type="text" size="50" onfocus="this.select()" readonly="readonly" value="{{ feed['url'] }}" />
+    <input type="hidden" name="audio" value="{{ feed['audio'] }}" />
+    <input type="hidden" name="video" value="{{ feed['video'] }}" />
+    <input type="hidden" name="items" value="{{ feed['items'] }}" />
     <div class="articleBody clear">
 </article>
 {% endfor %}
 
 <div class="line"></div>
-<article id="create">
-    <h2>Create New Feed</h2>
+<script>
+    var CreateFeed = new ModalBox('modal',{
+        feed_name: 'My Feed',
+        audio: false,
+        video: false,
+        items: null,
+        action: '/feed/create'
+    });
+</script>
+<article id="feed-create">
+    <h2><a href="javascript:;" onclick="CreateFeed.show();">Create New Feed</a></h2>
     <div class="articleBody clear">
 </article>
+
 {% endblock %}
