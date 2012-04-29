@@ -1,0 +1,128 @@
+<script>
+var ModalBox = function(box, o){
+    this.box = null;
+    this.feed_name = null;
+    this.audio = false;
+    this.video = false;
+    this.items = -1;
+
+    this.initialize = function(box, o){
+        this.box = box;
+        this.feed_name = o.feed_name;
+        this.audio = o.audio;
+        this.video = o.video;
+        this.items = o.items;
+    }
+
+    this.confirm = function(){
+        // TODO: AJAX submit form
+        $.colorbox.close();
+        $(this.handler).html(this.feed_name);
+    }
+
+    this.show = function(){
+        var self = this;
+        $("#modal-title").html("Feed Options:");
+
+        // TODO: Highlight items
+        $("#dir-tree").jstree({
+            "themes": {
+                "theme": "classic",
+                "dots": false
+            },
+            "json_data" : {
+                "ajax" : {
+                    "url" : function(node) {
+                        if(node != -1){
+                            return "http://api.put.io/v2/files/list?parent_id=" + node.attr("id")
+                        } else {
+                            return "http://api.put.io/v2/files/list?parent_id=0"
+                        }
+                    },
+                    "success": function(data) {
+                        var response = new Array();
+                        var root = false;
+                        var item;
+                        for(i in data.files){
+                            if(data.files[i].content_type == 'application/x-directory' &&
+                                 data.files[i].is_shared == false) {
+                                item = {
+                                    "state": "closed",
+                                    "data": data.files[i].name,
+                                    "attr": {
+                                      "id": data.files[i].id,
+                                      "name": data.files[i].name
+                                    }
+                                };
+                                response.push(item);
+
+                                if(data.files[i].parent_id == false){
+                                    root = true;
+                                }
+                            }
+                        }
+                        if(root){
+                            response = {
+                                "attr": {"id": 0, "name": "Your Files"},
+                                "data": "Your Files",
+                                "state": "open",
+                                "children": response
+                            }
+                        }
+                        return response;
+                    }
+                }
+            },
+            "plugins" : ["themes", "json_data", "ui"]
+        }).bind("select_node.jstree", function (e, data){
+            // TODO: Multiple select
+            self.items = data.rslt.obj.attr("id");
+        });
+        $.colorbox({
+            inline:true,
+            href:"#modal",
+            scrolling: false,
+            width: "30%",
+            top: "15%",
+            onComplete: function() {
+                var w = $('#cboxLoadedContent').width();
+                $('#cboxLoadedContent').width(w);
+                var h = $('#cboxLoadedContent').height();
+                $('#cboxLoadedContent').height(h);
+                $('#cboxOverlay').css({'opacity': 0.3});
+                //$('#cboxClose').remove();
+            }
+        });
+    }
+    this.initialize(box, o);
+}
+</script>
+<div style="display:none;">
+<div id="modal" style="height:335px;">
+    <div id="modal-frame" style="">
+        <div id="modal-title" style="margin:10px 20px;font-size:20px;font-weight:bold">
+        </div>
+        <div id="modal-inner" style="margin:10px 20px 10px 20px;padding:10px;border: 1px solid #DDD">
+            <form method="post" action="">
+                <span style="margin-left: 10px;">
+                    Name: <input type="text" size="15" name="feed_name" readonly="readonly" value="My Feed" />
+                </span>
+                <div id="dir-tree">
+                </div>
+                <table style="margin-left:8px;">
+                    <tr>
+                        <td><input style="margin-top:3px;" type="checkbox" name="audio" value="True" /></td>
+                        <td> Audio </td>
+                        <td>&nbsp;</td>
+                        <td><input style="margin-top:3px;" type="checkbox" name="Video" value="True" /></td>
+                        <td> Video </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div style="float:right; margin:10px 20px;">
+            <a class="start-button" style="padding:5px 10px;margin-top:5px;font-size:16px;" href="javascript:;" onclick="modal.confirm()">Save</a>
+        </div>
+    </div>
+</div>
+</div>
