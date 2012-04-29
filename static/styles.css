@@ -23,6 +23,7 @@ body{
 /* Hyperlink Styles: */
 
 a, a:visited {
+    color:#fcfcfc;
 	text-decoration:none;
 	outline:none;
 }

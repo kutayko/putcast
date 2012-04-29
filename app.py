@@ -152,6 +152,11 @@ def get_feed(feed_token, name="putcast"):
         abort(404)
 
 
+@app.route('/proxy/files/<int:parent_id>')
+def putio_proxy(parent_id=0):
+    return json.dumps(putio_call('/files/list?parent_id=%s' % parent_id))
+
+
 @app.route('/feed/test', methods=['GET'])
 def test_feed():
     feed = AtomFeed('PutCast',

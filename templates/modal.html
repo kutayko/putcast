@@ -34,9 +34,9 @@ var ModalBox = function(box, o){
                 "ajax" : {
                     "url" : function(node) {
                         if(node != -1){
-                            return "http://api.put.io/v2/files/list?parent_id=" + node.attr("id")
+                            return "/proxy/files/" + node.attr("id")
                         } else {
-                            return "http://api.put.io/v2/files/list?parent_id=0"
+                            return "/proxy/files/0"
                         }
                     },
                     "success": function(data) {
