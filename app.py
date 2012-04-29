@@ -217,7 +217,7 @@ def feed_crawler(feed, folder_id, audio=True, video=True):
             )
         
         # TODO: mkv from content type?
-        if video and f['name'].endswidth(".mkv"):
+        if video and f['name'].endswith(".mkv"):
             feed.add(title=f['name'],
                 url='%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id']),
                 updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
