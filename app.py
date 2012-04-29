@@ -159,6 +159,9 @@ def test_feed():
             )
     return feed.get_response()
 
+@app.route('/token/test', methods=['GET'])
+def test_token():
+    return session['oauth_token']
 
 def feed_crawler(feed, folder_id, audio=True, video=True):
     files = putio_call('/files/list?parent_id=%s' % folder_id)
