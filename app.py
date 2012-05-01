@@ -212,7 +212,7 @@ def feed_crawler(feed, db_feed, folder_id):
     video = db_feed['video']
     token = db_feed['user_token']
 
-    files = putio_call('/files/list?parent_id=%s' % folder_id, db_feed['feed_token'])
+    files = putio_call('/files/list?parent_id=%s' % folder_id, db_feed['user_token'])
     files = files['files']
     for f in files:
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
@@ -282,6 +282,7 @@ def add_oauth_token(url, token):
     if "?" in url:
         separator = "&"
     url += "%soauth_token=%s" % (separator, token)
+    return url
 
 if __name__ == '__main__':
     app.debug = config.DEBUG
