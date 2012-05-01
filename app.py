@@ -102,11 +102,15 @@ def register():
     if error:
         return "ERROR: %s" % error
     elif code:
-        url = "/oauth2/access_token?client_id=%s&client_secret=%s" % (config.APP_ID, config.APP_SECRET)
+        url = "%s/oauth2/access_token?client_id=%s&client_secret=%s" % (config.PUTIO_API_URL,
+                                                                        config.APP_ID,
+                                                                        config.APP_SECRET)
         url = "%s&grant_type=authorization_code&redirect_uri=%s/register" % (url, config.DOMAIN )
         url = "%s&code=%s" % (url, code)
 
-        data = putio_call(url)
+        req = urllib2.Request(url)
+        response = urllib2.urlopen(req)
+        data = json.loads(response.read())
         if 'access_token' in data:
             session['oauth_token'] = data['access_token']
             user = putio_call('/account/info')
