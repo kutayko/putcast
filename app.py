@@ -183,7 +183,7 @@ def get_feed(feed_token, name="putcast"):
 
         items = query_db('select * from items where feed_token=?', [feed_token])
         for item in items:
-            feed_crawler(atom_feed, item['folder_id'], audio=feed['audio'], video=feed['video'])
+            feed_crawler(atom_feed, item['folder_id'])
         return atom_feed.get_response()
     else:
         abort(404)
@@ -198,8 +198,10 @@ def putio_proxy(parent_id=0):
 # HELPERS
 
 
-def feed_crawler(feed, folder_id, audio=True, video=True):
-    files = putio_call('/files/list?parent_id=%s' % folder_id)
+def feed_crawler(feed, folder_id):
+    files = putio_call('/files/list?parent_id=%s' % folder_id, feed['feed_token'])
+    audio = feed['audio']
+    video = feed['video']
     files = files['files']
     for f in files:
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
@@ -224,17 +226,25 @@ def feed_crawler(feed, folder_id, audio=True, video=True):
             )
 
         if f['content_type'] == "application/x-directory":
-            feed_crawler(feed, f['id'], audio, video)
+            feed_crawler(feed, f['id'])
 
 
-def putio_call(query):
+def putio_call(query, token=None):
     url = "%s%s" % (config.PUTIO_API_URL, query)
-    if 'oauth_token' in session:
-        # TODO: too ugly, fix this
-        separator = "?"
-        if "?" in url:
-            separator = "&"
-        url += "%soauth_token=%s" % (separator, session['oauth_token'])
+
+    if token:
+        pass
+    elif 'oauth_token' in session:
+        token = session['oauth_token']
+    else:
+        abort(401) 
+
+    # TODO: too ugly, fix this
+    separator = "?"
+    if "?" in url:
+        separator = "&"
+    url += "%soauth_token=%s" % (separator, token)
+
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
     data = response.read()
