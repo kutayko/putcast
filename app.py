@@ -187,7 +187,7 @@ def get_feed(feed_token, name="putcast"):
         items = query_db('select * from items where feed_token=?', [feed_token])
         rss_items = []
         for item in items:
-            rss_items += feed_crawler(rss_items, db_feed, item['folder_id'])
+            rss_items += feed_crawler(db_feed, item['folder_id'])
 
         rss = {
             'title': db_feed['name'],
@@ -209,7 +209,9 @@ def putio_proxy(parent_id=0):
 # HELPERS
 
 
-def feed_crawler(items, db_feed, folder_id):
+def feed_crawler(db_feed, folder_id):
+    items = []
+
     audio = db_feed['audio']
     video = db_feed['video']
     token = db_feed['user_token']
@@ -219,7 +221,7 @@ def feed_crawler(items, db_feed, folder_id):
     for f in files:
 
         if f['content_type'] == "application/x-directory":
-            items += feed_crawler(items, db_feed, f['id'])
+            items += feed_crawler(db_feed, f['id'])
         else:
             item = {
                 'title': f['name'],
