@@ -20,6 +20,7 @@
     	<itunes:summary>PutCast | Generate podcast from Put.io</itunes:summary>
     	<itunes:author>PutCast</itunes:author>
     	<itunes:image href="http://put.io/images/apple-touch-icon.png" />
+        <itunes:explicit>no</itunes:explicit>
     	<itunes:owner>
     		<itunes:name>PutCast | {{ rss['title'] }}</itunes:name>
                     <itunes:email>putcast@foov.io</itunes:email>
@@ -29,9 +30,9 @@
     	<itunes:subtitle>PutCast | Generate podcast from Put.io</itunes:subtitle>
     	<itunes:keywords>put.io, putcast</itunes:keywords>
     	<image>
-    		<title>Put.io</title>
+    		<title>{{ rss['title'] }}</title>
     		<url>http://put.io/images/apple-touch-icon.png</url>
-    		<link>http://www.put.io</link>
+    		<link>{{ rss['link'] }}</link>
     	</image>
     	<itunes:category text="Technology">
     		<itunes:category text="Gadgets" />
@@ -40,6 +41,7 @@
             <item>
                 <title>{{ item['title'] }}</title>
                 <link>{{ item['link'] }}</link>
+                <guid>{{ item['link'] }}</guid>
                 <enclosure url="{{ item['link'] }}" length="{{ item['size'] }}" type="{{ item['content_type'] }}" />
                 <itunes:explicit>no</itunes:explicit>
                 <pubDate>{{ item['pubDate'] }}</pubDate>
