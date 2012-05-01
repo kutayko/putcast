@@ -218,7 +218,7 @@ def feed_crawler(feed, db_feed, folder_id):
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
                     (video and f['content_type'] in SUPPORTED_VIDEO_DIRECT):
             url = '%s/files/%s/download' % (config.PUTIO_API_URL, f['id'])
-            url = add_oauth_token(url, db_feed['user_token'])
+            #url = add_oauth_token(url, db_feed['user_token'])
 
             feed.add(
                 title=f['name'],
@@ -229,7 +229,7 @@ def feed_crawler(feed, db_feed, folder_id):
         if video and f['content_type'] in SUPPORTED_VIDEO:
             # TODO: Check if mp4 available
             url = '%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id'])
-            url = add_oauth_token(url, db_feed['user_token'])
+            #url = add_oauth_token(url, db_feed['user_token'])
 
             feed.add(
                 title=f['name'],
@@ -240,7 +240,7 @@ def feed_crawler(feed, db_feed, folder_id):
         # TODO: mkv from content type?
         if video and f['name'].endswith(".mkv"):
             url = '%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id'])
-            url = add_oauth_token(url, db_feed['user_token'])
+            #url = add_oauth_token(url, db_feed['user_token'])
 
             feed.add(
                 title=f['name'],
