@@ -6,6 +6,7 @@ import urllib2
 import string
 import random
 
+from email import utils
 from functools import wraps
 from contextlib import closing
 from urlparse import urljoin
@@ -223,11 +224,17 @@ def feed_crawler(db_feed, folder_id):
         if f['content_type'] == "application/x-directory":
             items += feed_crawler(db_feed, f['id'])
         else:
+
+            date = datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
+            date = float(date.strftime('%s'))
+            date = utils.formatdate(date)
+
+
             item = {
                 'title': f['name'],
                 'size': f['size'],
                 'content_type': f['content_type'],
-                'pubDate': datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
+                'pubDate': date
             }
 
             if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
