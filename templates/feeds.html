@@ -9,16 +9,18 @@
 </article>
 
 {% for feed in feeds %}
-<article>
+<article id="feed-{{ feed['feed_token'] }}">
     <div style="position:relative;">
         <h2>{{ feed['name'] }}</h2>
-        <a class="button close" href="javascript:;">&#10006;</a>
+        <a class="button delete" href="javascript:;">&#10006;</a>
         <div class="line"></div>
         <input type="text" size="50" onfocus="this.select()" readonly="readonly" value="{{ feed['url'] }}" />
         <input type="hidden" name="audio" value="{{ feed['audio'] }}" />
         <input type="hidden" name="video" value="{{ feed['video'] }}" />
         <input type="hidden" name="items" value="{{ feed['items'] }}" />
-        <div class="articleBody clear">
+        <form method="POST" action="/feed/delete">
+            <input type="hidden" name="feed_token" value="{{ feed['feed_token'] }}" />
+        </form>
     </div>
 </article>
 {% endfor %}
@@ -32,13 +34,22 @@
         items: [],
         action: '/feed/create'
     });
+
+    $(function(){
+        $('.delete').click(function(){
+            var title = $(this).parent().find("h2").html();
+            var confirmed = confirm('Delete "' +  title + '"?');
+            if(confirmed){
+                $(this).parent().find("form").submit();
+            }
+        });  
+    });
 </script>
 <article id="feed-create">
     <h2>
         <a class="button add" href="javascript:;" onclick="CreateFeed.show();">+</a>
         <a href="javascript:;" onclick="CreateFeed.show();">Create New Feed</a>
     </h2>
-    <div class="articleBody clear">
 </article>
 
 {% endblock %}

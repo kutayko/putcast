@@ -157,7 +157,22 @@ def new_feed():
 @app.route('/feed/delete', methods=['POST'])
 @auth_required
 def delete_feed():
-    raise NotImplementedError
+    try:
+        token = request.form['feed_token']
+        user_token = session['oauth_token']
+    except KeyError:
+        abort(400)
+
+    feed = query_db('select * from feeds where feed_token = ?', [token], one=True)
+    if feed:
+        if feed['user_token'] != user_token:
+            abort(401)
+        else:
+            query_db('delete from items where feed_token = ?', [token])
+            query_db('delete from feeds where feed_token = ?', [token])
+            g.db.commit()
+    return redirect(url_for('list_feeds'))
+
 
 
 @app.route('/feeds', methods=['GET'])
@@ -174,6 +189,7 @@ def list_feeds():
             "url": "%s/feed/%s/%s.atom" % (config.DOMAIN, feed['feed_token'], name_encoded),
             "audio": feed['audio'],
             "video": feed['video'],
+            "feed_token": feed['feed_token'],
             "items": json.dumps(items_parsed)
         }
         response.append(feed_response)
