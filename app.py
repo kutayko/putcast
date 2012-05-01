@@ -224,7 +224,7 @@ def feed_crawler(items, db_feed, folder_id):
             item = {
                 'title': f['name'],
                 'size': f['size'],
-                'content_type': f['content_type']
+                'content_type': f['content_type'],
                 'pubDate': datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
             }
 
