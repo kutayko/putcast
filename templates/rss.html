@@ -19,7 +19,7 @@
     <!-- podcast_generator="Blubrry PowerPress/1.0.11" mode="advanced" entry="advanced" -->
     	<itunes:summary>PutCast | Generate podcast from Put.io</itunes:summary>
     	<itunes:author>PutCast</itunes:author>
-    	<itunes:image href="https://put.io/images/apple-touch-icon.png" />
+    	<itunes:image href="http://put.io/images/apple-touch-icon.png" />
     	<itunes:owner>
     		<itunes:name>PutCast | {{ rss['title'] }}</itunes:name>
                     <itunes:email>putcast@foov.io</itunes:email>
@@ -30,7 +30,7 @@
     	<itunes:keywords>put.io, putcast</itunes:keywords>
     	<image>
     		<title>Put.io</title>
-    		<url>https://put.io/images/apple-touch-icon.png</url>
+    		<url>http://put.io/images/apple-touch-icon.png</url>
     		<link>http://www.put.io</link>
     	</image>
     	<itunes:category text="Technology">
@@ -43,7 +43,6 @@
                 <enclosure url="{{ item['link'] }}" length="{{ item['size'] }}" type="{{ item['content_type'] }}" />
                 <itunes:explicit>no</itunes:explicit>
                 <pubDate>{{ item['pubDate'] }}</pubDate>
-                <itunes:duration>00:00</itunes:duration>
             </item>
             {% endfor %}
 </channel>

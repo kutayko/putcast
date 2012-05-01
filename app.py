@@ -196,7 +196,9 @@ def get_feed(feed_token, name="putcast"):
             'items': rss_items
         }
 
-        return render_template('rss.html', rss=rss)
+        response = make_response(render_template('rss.html', rss=rss))
+        response.headers['Content-Type'] = 'application/rss+xml'
+        return response
     else:
         abort(404)
 
