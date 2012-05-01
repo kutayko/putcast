@@ -192,7 +192,7 @@ def get_feed(feed_token, name="putcast"):
 
         items = query_db('select * from items where feed_token=?', [feed_token])
         for item in items:
-            feed_crawler(atom_feed, item['folder_id'])
+            feed_crawler(atom_feed, feed, item['folder_id'])
         return atom_feed.get_response()
     else:
         abort(404)
@@ -207,35 +207,49 @@ def putio_proxy(parent_id=0):
 # HELPERS
 
 
-def feed_crawler(feed, folder_id):
-    files = putio_call('/files/list?parent_id=%s' % folder_id, feed['feed_token'])
-    audio = feed['audio']
-    video = feed['video']
+def feed_crawler(feed, db_feed, folder_id):
+    audio = db_feed['audio']
+    video = db_feed['video']
+    token = db_feed['user_token']
+
+    files = putio_call('/files/list?parent_id=%s' % folder_id, db_feed['feed_token'])
     files = files['files']
     for f in files:
         if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
                     (video and f['content_type'] in SUPPORTED_VIDEO_DIRECT):
-                feed.add(title=f['name'],
-                url='%s/files/%s/download' % (config.PUTIO_API_URL, f['id']),
+            url = '%s/files/%s/download' % (config.PUTIO_API_URL, f['id'])
+            url = add_oauth_token(url)
+
+            feed.add(
+                title=f['name'],
+                url=url,
                 updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
             )
 
         if video and f['content_type'] in SUPPORTED_VIDEO:
             # TODO: Check if mp4 available
-            feed.add(title=f['name'],
-                url='%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id']),
+            url = '%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id'])
+            url = add_oauth_token(url)
+
+            feed.add(
+                title=f['name'],
+                url=url,
                 updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
             )
         
         # TODO: mkv from content type?
         if video and f['name'].endswith(".mkv"):
-            feed.add(title=f['name'],
-                url='%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id']),
+            url = '%s/files/%s/mp4/download' % (config.PUTIO_API_URL, f['id'])
+            url = add_oauth_token(url)
+
+            feed.add(
+                title=f['name'],
+                url=url,
                 updated=datetime.datetime.strptime(f['created_at'], "%Y-%m-%dT%H:%M:%S")
             )
 
         if f['content_type'] == "application/x-directory":
-            feed_crawler(feed, f['id'])
+            feed_crawler(feed, db_feed, f['id'])
 
 
 def putio_call(query, token=None):
@@ -248,11 +262,7 @@ def putio_call(query, token=None):
     else:
         abort(401) 
 
-    # TODO: too ugly, fix this
-    separator = "?"
-    if "?" in url:
-        separator = "&"
-    url += "%soauth_token=%s" % (separator, token)
+    url = add_oauth_token(url, token)
 
     req = urllib2.Request(url)
     response = urllib2.urlopen(req)
@@ -267,6 +277,11 @@ def generate_feed_token():
         return generate_feed_token()
     return token
 
+def add_oauth_token(url, token):
+    separator = "?"
+    if "?" in url:
+        separator = "&"
+    url += "%soauth_token=%s" % (separator, token)
 
 if __name__ == '__main__':
     app.debug = config.DEBUG
