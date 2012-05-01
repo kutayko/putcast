@@ -88,6 +88,11 @@ def about():
     return render_template('index.html')
 
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('index'))
+
 @app.route('/auth', methods=['GET'])
 def auth():
     url = "%s/oauth2/authenticate?client_id=%s" % (config.PUTIO_API_URL, config.APP_ID)
