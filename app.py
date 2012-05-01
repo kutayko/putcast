@@ -157,10 +157,10 @@ def delete_feed():
 @app.route('/feeds', methods=['GET'])
 @auth_required
 def list_feeds():
-    feeds = query_db('select * from Feeds where user_token=?', [session['oauth_token']])
+    feeds = query_db('select * from feeds where user_token=?', [session['oauth_token']])
     response = []
     for feed in feeds:
-        items = query_db('select * from Items where feed_token=?', [feed['feed_token']])
+        items = query_db('select * from items where feed_token=?', [feed['feed_token']])
         items_parsed = [item['folder_id'] for item in items]
         name_encoded = urllib.quote_plus(feed['name'])
         feed_response = {
@@ -177,7 +177,7 @@ def list_feeds():
 @app.route('/feed/<feed_token>', methods=['GET'])
 @app.route('/feed/<feed_token>/<name>.atom', methods=['GET'])
 def get_feed(feed_token, name="putcast"):
-    feed = query_db('select * from Feeds where feed_token=?', [feed_token], one=True)
+    feed = query_db('select * from feeds where feed_token=?', [feed_token], one=True)
     if feed:
         # TODO: iTunes required fields
         atom_feed = AtomFeed(feed['name'],
