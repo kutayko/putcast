@@ -10,7 +10,7 @@
 
     <h3>Hello {{ session.username }},</h3>
     <p class="tight">Here you can find your feeds.<br/>
-     Just create a feed and copy/paste the link to your iTunes!</p>
+     Just create a feed and copy &amp; paste the link to your iTunes!</p>
        <div class="line"></div>
 {% for feed in feeds %}
 <article id="feed-{{ feed['feed_token'] }}">
