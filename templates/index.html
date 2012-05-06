@@ -4,12 +4,25 @@
         <h2>About PutCast</h2>
         <div class="line"></div>
         <div class="articleBody clear">
-            <figure>
-                <a href="#"><img src="/static/images/633.jpg" width="620" height="340" /></a>
-            </figure>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer luctus quam quis nibh fringilla sit amet consectetur lectus malesuada. Sed nec libero erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc mi nisi, rhoncus ut vestibulum ac, sollicitudin quis lorem. Duis felis dui, vulputate nec adipiscing nec, interdum vel tortor. Sed gravida, erat nec rutrum tincidunt, metus mauris imperdiet nunc, et elementum tortor nunc at eros. Donec malesuada congue molestie. Suspendisse potenti. Vestibulum cursus congue sem et feugiat. Morbi quis elit odio. </p>
-
-            <a class="button" href="/auth">Log in with Put.io!</a>
+            <div class="left-col">
+                <p>PutCast lets you generate RSS feeds from your Put.io account. By using iTunes or an RSS downloader, you can download your files automatically to your computer, iPad or other device. All you have to do is:</p>
+                <ul>
+                    <li>Click <b>Log in</b> below to let Putcast reach your files on Put.io</li>
+                    <li>Create a new feed and choose the folders you want to include</li>
+                    <li>Copy &amp; paste the link you get to your iTunes<br/>(Advanced > Subscribe to podcast)</li>
+                </ul>
+                <p style="padding-bottom:0px;">That's all! iTunes will automatically sync with your feed every day.</p>
+                <div class="button-container">
+                    <div>
+                        <a class="button" href="/auth">Log in with Put.io</a>
+                    </div>
+                </div>
+            </div>
+            <div class="right-col">
+                <figure>
+                    <img src="/static/images/putcast.png" />
+                </figure>
+            </div>
         </div>
     </article>
 {% endblock %}
