@@ -14,7 +14,7 @@
         <h2>{{ feed['name'] }}</h2>
         <a class="button delete" href="javascript:;">&#10006;</a>
         <div class="line"></div>
-        <input type="text" size="50" onfocus="this.select()" readonly="readonly" value="{{ feed['url'] }}" />
+        <input type="text" style="width:100%;" onfocus="this.select()" readonly="readonly" value="{{ feed['url'] }}" />
         <input type="hidden" name="audio" value="{{ feed['audio'] }}" />
         <input type="hidden" name="video" value="{{ feed['video'] }}" />
         <input type="hidden" name="items" value="{{ feed['items'] }}" />
