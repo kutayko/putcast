@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
+
+{% block head %}
+    {{ super() }}
+    <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+{% endblock %}
+
 {% block content %}
 {% include 'modal.html' %}
 
-<article id="hello">
     <h3>Hello {{ session.username }},</h3>
     <p class="tight">Here you can find your feeds.<br/>
      Just create a feed and copy/paste the link to your iTunes!</p>
-</article>
-
+       <div class="line"></div>
 {% for feed in feeds %}
 <article id="feed-{{ feed['feed_token'] }}">
     <div style="position:relative;">
@@ -47,8 +51,10 @@
 </script>
 <article id="feed-create">
     <h2>
-        <a class="button add" href="javascript:;" onclick="CreateFeed.show();">+</a>
-        <a href="javascript:;" onclick="CreateFeed.show();">Create New Feed</a>
+        <a href="javascript:;" onclick="CreateFeed.show();">
+            <span style="font-size:25px;">+</span>
+            Create New Feed
+        </a>
     </h2>
 </article>
 
