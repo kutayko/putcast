@@ -12,7 +12,6 @@ from contextlib import closing
 from urlparse import urljoin
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, make_response
-from werkzeug.contrib.atom import AtomFeed
 
 import config
 
@@ -186,7 +185,7 @@ def list_feeds():
         name_encoded = urllib.quote_plus(feed['name'])
         feed_response = {
             "name": feed['name'],
-            "url": "%s/feed/%s/%s.atom" % (config.DOMAIN, feed['feed_token'], name_encoded),
+            "url": "%s/feed/%s/%s" % (config.DOMAIN, feed['feed_token'], name_encoded),
             "audio": feed['audio'],
             "video": feed['video'],
             "feed_token": feed['feed_token'],
@@ -197,7 +196,7 @@ def list_feeds():
 
 
 @app.route('/feed/<feed_token>', methods=['GET'])
-@app.route('/feed/<feed_token>/<name>.atom', methods=['GET'])
+@app.route('/feed/<feed_token>/<name>', methods=['GET'])
 def get_feed(feed_token, name="putcast"):
     db_feed = query_db('select * from feeds where feed_token=?', [feed_token], one=True)
     if db_feed:
