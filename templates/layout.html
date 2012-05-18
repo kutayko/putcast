@@ -37,9 +37,13 @@
             <nav class="clear">
                 <ul>
                     <li><a href="http://put.io">Go to Put.io</a></li>
-                    <li><a href="/about">About PutCast</a></li>
-                    <li><a href="http://foov.io">About Me</a></li>
-                    <li><a href="/logout">Log Out</a></li>
+                    <li><a href="/about">About</a></li>
+                    {% if session.oauth_token %}
+                        <li><a href="/feeds">Feeds</a></li>
+                        <li><a href="/logout">Log Out</a></li>
+                    {% else %}
+                        <li><a href="/auth">Log In</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </header>
@@ -52,7 +56,7 @@
 
         <footer>
            <div class="line"></div>
-           <p>Copyright 2012 - Foov.io</p>
+           <p>Copyright 2012 - FooVio</p>
            <a href="#" class="up">Go UP</a>
            <a href="http://www.html5xcss3.com/" class="by" target="_blank">Free Html5 Templates</a> <a href="http://tutorialzine.com" target="_blank" class="by"> by Tutorialzine</a>
         </footer>
