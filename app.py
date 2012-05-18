@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 SUPPORTED_AUDIO = ('audio/mpeg')
-SUPPORTED_VIDEO = ('video/x-msvideo')
+SUPPORTED_VIDEO = ('video/x-msvideo', 'video/x-matroska')
 SUPPORTED_VIDEO_DIRECT = ('video/mp4')
 
 
@@ -183,7 +183,7 @@ def list_feeds():
     for feed in feeds:
         items = query_db('select * from items where feed_token=?', [feed['feed_token']])
         items_parsed = [item['folder_id'] for item in items]
-        name_encoded = urllib.quote_plus(feed['name'])
+        name_encoded = urllib.quote_plus(feed['name'].encode("ascii","ignore"))
         feed_response = {
             "name": feed['name'],
             "url": "%s/feed/%s/%s" % (config.DOMAIN, feed['feed_token'], name_encoded),
@@ -196,7 +196,7 @@ def list_feeds():
     return render_template('feeds.html',feeds=response)
 
 
-@app.route('/feed/<feed_token>', methods=['GET'])
+@app.route('/feed/<feed_token>/', methods=['GET'])
 @app.route('/feed/<feed_token>/<name>', methods=['GET'])
 def get_feed(feed_token, name="putcast"):
     db_feed = query_db('select * from feeds where feed_token=?', [feed_token], one=True)
