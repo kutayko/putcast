@@ -307,5 +307,4 @@ def add_oauth_token(url, token):
 
 if __name__ == '__main__':
     app.debug = config.DEBUG
-    #app.run(host="0.0.0.0", port=config.PORT)
-    app.run()
+    app.run(host="0.0.0.0", port=config.PORT)
