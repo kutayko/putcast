@@ -81,7 +81,7 @@ def index():
     if "oauth_token" in session:
         return redirect(url_for('list_feeds'))
     else:
-        return redirect(url_for('about'))
+        return render_template('index.html')
 
 
 @app.route('/about')
