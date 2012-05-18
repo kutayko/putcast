@@ -266,6 +266,7 @@ def feed_crawler(db_feed, folder_id):
             if video and (f['content_type'] in SUPPORTED_VIDEO or f['name'].endswith(".mkv")):
                 if f['is_mp4_available']:
                     item['link'] = '%s/files/%s/mp4/download.mp4' % (config.PUTIO_API_URL, f['id'])
+                    item['link'] = add_oauth_token(item['link'], db_feed['user_token'])
                     items.append(item)
     return items
 
