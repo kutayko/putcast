@@ -5,8 +5,8 @@ USERNAME = ''
 PASSWORD = ''
 
 
-PORT = 5000
-DOMAIN = 'http://putcast.foov.io'
+PORT = 8000
+DOMAIN = 'http://www.putcast.com'
 APP_ID = -1
 APP_SECRET = ''
 PUTIO_API_URL = 'https://api.put.io/v2'
