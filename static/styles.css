@@ -81,6 +81,8 @@ p{
 
 p.tight { padding-bottom:0;}
 
+p.red { color:red;}
+
 .line{
 	/* The dividing line: */
 	height:1px;

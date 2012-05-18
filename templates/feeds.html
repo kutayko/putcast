@@ -9,9 +9,14 @@
 {% include 'modal.html' %}
 
     <h3>Hello {{ session.username }},</h3>
-    <p class="tight">Here you can find your feeds.<br/>
-     Just create a feed and copy &amp; paste the link to your iTunes!</p>
-       <div class="line"></div>
+    <p class="tight">
+        Here you can find your feeds.<br/>
+        Just create a feed and copy &amp; paste the link to your iTunes!
+    </p>
+    <p class="tight">
+        WARNING: Do not share these links in any publicly available place! People will obtain your oauth token and may abuse your Put.io account!
+    </p>
+    <div class="line"></div>
 {% for feed in feeds %}
 <article id="feed-{{ feed['feed_token'] }}">
     <div style="position:relative;">
