@@ -14,7 +14,11 @@
                 <p style="padding-bottom:0px;">That's all! iTunes will automatically sync with your feed every day.</p>
                 <div class="button-container">
                     <div>
+                    {% if session.oauth_token %}
+                        <a class="button" href="/logout">Log Out</a>
+                    {% else %}
                         <a class="button" href="/auth">Log in with Put.io</a>
+                    {% endif %}
                     </div>
                 </div>
             </div>
