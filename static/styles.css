@@ -223,6 +223,11 @@ footer a.up{
 	float:right;
 }
 
+footer a.self {
+    font-size: 12px;
+    font-weight: bold;
+}
+
 .button {
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FF6600), color-stop(100%,#E45C00));
     background: -moz-linear-gradient(center top, #FF6600 0%, #E45C00 100%);
