@@ -259,7 +259,7 @@ def feed_crawler(db_feed, folder_id):
 
             if (audio and f['content_type'] in SUPPORTED_AUDIO) or \
                         (video and f['content_type'] in SUPPORTED_VIDEO_DIRECT):
-                item['link'] = '%s/files/%s/download/putcast.%s' % (config.PUTIO_API_URL, f['id'], extension)
+                item['link'] = '%s/files/%s/download/putcast%s' % (config.PUTIO_API_URL, f['id'], extension)
                 item['link'] = add_oauth_token(item['link'], db_feed['user_token'])
                 items.append(item)
 
