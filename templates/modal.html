@@ -4,6 +4,7 @@ var ModalBox = function(box, o){
     this.feed_name = null;
     this.audio = false;
     this.video = false;
+    this.org = false;
     this.items = new Array();
     this.action = null;
 
@@ -12,6 +13,7 @@ var ModalBox = function(box, o){
         this.feed_name = o.feed_name;
         this.audio = o.audio;
         this.video = o.video;
+        this.org = o.org;
         this.items = o.items;
         this.action = o.action;
 
@@ -19,6 +21,7 @@ var ModalBox = function(box, o){
         $(this.box + ' form input[name=feed_name]').val(this.feed_name);
         $(this.box + ' form input[name=audio]').val(this.audio);
         $(this.box + ' form input[name=video]').val(this.video);
+        $(this.box + ' form input[name=org]').val(this.org);
     }
 
     this.confirm = function(){
@@ -121,9 +124,14 @@ var ModalBox = function(box, o){
                     <tr>
                         <td><input style="margin-top:3px;" type="checkbox" name="types" value="audio" checked="checked" /></td>
                         <td> Audio </td>
-                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
                         <td><input style="margin-top:3px;" type="checkbox" name="types" value="video" checked="checked" /></td>
                         <td> Video </td>
+                    </tr>
+                    <tr>
+                        <td><input style="margin-top:3px;" type="checkbox" name="org" value="org" /></td>
+                        <td> Download Originals (leave unchecked for iTunes)</td>
                     </tr>
                 </table>
                 <input type="hidden" name="items" value="" />

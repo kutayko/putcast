@@ -130,7 +130,6 @@ def new_feed():
     try:
         name = request.form['feed_name']
         items = request.form['items']
-        audio = request.form.get('audio', False)
         types = request.form.getlist('types')
     except KeyError:
         abort(400)
@@ -142,9 +141,13 @@ def new_feed():
     if 'video' in types:
         video = True
 
+    org = False
+    if 'org' in request.form:
+        org = True
+
     feed_token = generate_feed_token()
-    query_db('insert into feeds (user_token, feed_token, name, audio, video) values (?, ? ,?, ?, ?)',
-                [session['oauth_token'], feed_token, name, audio, video])
+    query_db('insert into feeds (user_token, feed_token, name, audio, video, org) values (?, ? ,?, ?, ?, ?)',
+                [session['oauth_token'], feed_token, name, audio, video, org])
 
     for item in items.split(','):
         query_db('insert into items (feed_token, folder_id) values (?, ?)',
@@ -233,6 +236,7 @@ def feed_crawler(db_feed, folder_id):
 
     audio = db_feed['audio']
     video = db_feed['video']
+    org = db_feed['org']
     token = db_feed['user_token']
 
     files = putio_call('/files/list?parent_id=%s' % folder_id, db_feed['user_token'])
@@ -264,7 +268,11 @@ def feed_crawler(db_feed, folder_id):
                 items.append(item)
 
             if video and (f['content_type'] in SUPPORTED_VIDEO or f['name'].endswith(".mkv")):
-                if f['is_mp4_available']:
+                if org:
+                    item['link'] = '%s/files/%s/download/putcast%s' % (config.PUTIO_API_URL, f['id'], extension)
+                    item['link'] = add_oauth_token(item['link'], db_feed['user_token'])
+                    items.append(item)
+                elif f['is_mp4_available']:
                     item['link'] = '%s/files/%s/mp4/download/putcast.mp4' % (config.PUTIO_API_URL, f['id'])
                     item['link'] = add_oauth_token(item['link'], db_feed['user_token'])
                     items.append(item)
